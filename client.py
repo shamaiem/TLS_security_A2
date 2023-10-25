@@ -1,45 +1,82 @@
-############
-## CLIENT ##
-############
+import socket
+import encryption_module
+import json
 
-import ssl
-import socket 
-import hashlib
-import math
-import random
-from sympy import isprime
+server_response = " "
 
-#Server Settings
+# -------------------- FUNCTIONS ------------------ #
+
+# Function to take input from the client
+def client_input():
+    print("+=+=+=+=+=+=+=+=+=+=+=+=+")
+    print("Enter client's message:")
+    print("+=+=+=+=+=+=+=+=+=+=+=+=+")
+    client_message = input()
+    return client_message
+
+def establish_client_handshake():
+    # Exchange
+    # "Client Hello" message
+    client_message = "Client Hello!"
+    print("Client sent first handshake with, ",client_message)
+    client_socket.send(client_message.encode())
+
+# ------------------- FUNCTIONS END ------------- #
+
+# Server Settings
 SERVER_HOST = 'localhost'
 SERVER_PORT = 12345
 
-#Creating a Socket
+# Creating a Socket
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((SERVER_HOST, SERVER_PORT))
 
-while True: 
-    print("+=+=+=+=+=+=+=+=+=+=+=+=+")
-    print("Enter clients message: ") 
-    print("+=+=+=+=+=+=+=+=+=+=+=+=+")
-    message = input()
-    if message == 'quit':
-        break
+establish_client_handshake()
+server_response = client_socket.recv(1024).decode()
+if server_response == "Server Hello!":
+    print("Client received second handshake with, ", server_response)
 
-    #Exchange
-    #client hello
-    
-    #send message to the server
-    client_socket.send(message.encode())
+    # ----------------------- ENCRYPTED COMMUNICATION ----------------- #
+    # while True:
+    #     client_message = client_input()
 
-    #receiev message from server
-    reponse = client_socket.recv(1024).decode()
+    #     # Send message to the server
+    #     client_socket.send(client_message.encode())
 
-    #Calculate public key and send to server
+    #     if client_message == 'quit':
+    #         break
 
-    #Receive servers public key in plain text
+    #     # Receive message from the server
+    #     server_response = client_socket.recv(1024).decode()
 
-    #Calculate shared secret key
+    #     # Calculate public key and send to the server
+    #     # Receive the server's public key in plain text
+    #     # Calculate the shared secret key
 
-    print(f"Received message from server:{reponse}")
+    #     print(f"Received message from server: {server_response}")
+else:
+    print("Three-Way Handshake Failed.")
 
+private_key, public_key =encryption_module.RSAkeygeneration(8)
+print(f"Server Public key {public_key}, Server Private Key {private_key}")
+
+# Initializing certificate content
+certificate_content = {
+    'subject': 'client',
+    'public_key': public_key
+}
+
+# Signing Certificate
+
+json_string = json.dumps(certificate_content)
+signature = encryption_module.create_sig(json_string, private_key)
+
+# Assembling certificate
+certificate = {
+    'certificate_content': certificate_content,
+    'signature': signature,
+}
+
+
+# ---------------------------- CLOSE SOCKET ------------------- #
 client_socket.close()

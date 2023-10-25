@@ -1,11 +1,11 @@
 # Step 1: Generate a key pair (usually done beforehand)
 import ast
 import hashlib
-import encryption
+import encryption_module
 import json
-import RSAencryption
+import RSAencryption_module
 
-private_key, public_key =encryption.RSAkeygeneration(8)
+private_key, public_key =encryption_module.RSAkeygeneration(8)
 
 # Step 2: Create certificate content
 certificate_content = {
@@ -16,7 +16,7 @@ certificate_content = {
 # Step 3: Certificate signing
 
 json_string = json.dumps(certificate_content)
-signature = encryption.create_sig(json_string, private_key)
+signature = encryption_module.create_sig(json_string, private_key)
 
 # Step 4: Assemble certificate
 certificate = {
@@ -32,6 +32,6 @@ certificate = {
 # print("with hashing the message: ",RSAencryption.verify_sig('alice',sig2,public_key))
 
 print(public_key)
-encrypted=encryption.RSAencryptCH(json.dumps(public_key),private_key)
-decrypted=encryption.RSAdecryptCH(encrypted,public_key)
-print( encryption.convert_to_tuple(decrypted) == public_key)
+encrypted=encryption_module.RSAencryptCH(json.dumps(public_key),private_key)
+decrypted=encryption_module.RSAdecryptCH(encrypted,public_key)
+print(encryption_module.convert_to_tuple(decrypted) == public_key)
