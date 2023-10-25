@@ -1,6 +1,7 @@
 import socket
 import encryption_module
 import json
+import RSAencryption_module
 
 client_message = " "
 
@@ -61,8 +62,7 @@ certificate_content = {
     'public_key': public_key
 }
 
-# Signing Certificate
-
+# Signing certificate
 json_string = json.dumps(certificate_content)
 signature = encryption_module.create_sig(json_string, private_key)
 
@@ -71,6 +71,20 @@ certificate = {
     'certificate_content': certificate_content,
     'signature': signature,
 }
+
+# Verifying certificate
+valid=encryption_module.verify_sig(json_string,signature,public_key)
+print("with hashing as string: ",valid)
+
+print("")
+
+sig2=RSAencryption_module.create_sig('server',private_key)
+print("with hashing as int the message: ",RSAencryption_module.verify_sig('server',sig2,public_key))
+
+print(public_key)
+encrypted=encryption_module.RSAencryptCH(json.dumps(public_key),private_key)
+decrypted=encryption_module.RSAdecryptCH(encrypted,public_key)
+print(encryption_module.convert_to_tuple(decrypted) == public_key)
 
 # while True:
 #     client_message = recv_client_message()

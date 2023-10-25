@@ -4,7 +4,7 @@ import cryptography.fernet
 from cryptography.fernet import Fernet
 import random
 import math
-import SHA_256
+import SHA256_module
 import hashlib
 
 #---------------------------------------------------AES cryptography---------------------------------------------------#

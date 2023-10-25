@@ -1,6 +1,4 @@
 # Step 1: Generate a key pair (usually done beforehand)
-import ast
-import hashlib
 import encryption_module
 import json
 import RSAencryption_module
