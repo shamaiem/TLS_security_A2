@@ -4,6 +4,7 @@ import hashlib
 import encryption
 import json
 import RSAencryption
+import SHA_256
 
 private_key, public_key =encryption.RSAkeygeneration(8)
 
@@ -14,6 +15,8 @@ certificate_content = {
 }
 
 # Step 3: Certificate signing
+certificate_hash=SHA_256.sha256(str(certificate_content).encode())
+certificate_hash_str=str(certificate_hash)
 
 json_string = json.dumps(certificate_content)
 signature = encryption.create_sig(json_string, private_key)
@@ -25,13 +28,17 @@ certificate = {
 }
 
 # Step 5: Verification
-# valid= encryption.verify_sig(json_string, signature, public_key)
-# print("without the hashing the message: ",valid)
 
-# sig2=RSAencryption.create_sig('alice',private_key)
-# print("with hashing the message: ",RSAencryption.verify_sig('alice',sig2,public_key))
+valid=encryption.verify_sig(json_string,signature,public_key)
+print("with hashing as string: ",valid)
 
-print(public_key)
-encrypted=encryption.RSAencryptCH(json.dumps(public_key),private_key)
+print("")
+
+sig2=RSAencryption.create_sig('alice',private_key)
+print("with hashing as int the message: ",RSAencryption.verify_sig('alice',sig2,public_key))
+
+print("")
+print("checking public key encyrption and decryption")
+encrypted=encryption.RSAencryptCH((public_key),private_key)
 decrypted=encryption.RSAdecryptCH(encrypted,public_key)
 print( encryption.convert_to_tuple(decrypted) == public_key)
