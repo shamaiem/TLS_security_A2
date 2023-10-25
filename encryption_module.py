@@ -79,23 +79,43 @@ def mod_inverse(e, phi):
 
 def RSAencryptCH(plaintext, public_key):
     e, n = public_key
-    json_dict = json.loads(plaintext)
-
+    #json_dict = json.loads(plaintext)
     # Serialize the dictionary back into a JSON string (this step is optional)
-    serialized_json = json.dumps(json_dict)
+    serialized_json = json.dumps(plaintext)
     encrypted_text = [pow(ord(char), e, n) for char in serialized_json]
+    
     return encrypted_text
 
 def RSAdecryptCH(encrypted_text, private_key):
     d, n = private_key
     decrypted_text = [chr(pow(char, d, n)) for char in encrypted_text]
-    
     # Convert the list of characters to a single string
     decrypted_string = ''.join(decrypted_text)
-
     # Replace any non-printable or non-ASCII characters
     decrypted_string = ''.join(char for char in decrypted_string if char.isprintable() or char.isascii())
     return decrypted_string
+
+
+def create_sig(message, private_key):
+    signature = RSAencryptCH(message, private_key)
+    return signature
+
+
+def verify_sig(message, signature, public_key):
+    decrypted_message_digest = RSAdecryptCH(signature, public_key)
+    decrypted_message_digest = json.loads(decrypted_message_digest)
+    # print("decrypted_message_digest: ",(decrypted_message_digest))
+    # print("message: ",(message))
+    if ((decrypted_message_digest ))==(message):
+        return True  # Signature is valid
+    else:
+        return False  # Signature is invalid
+    
+    
+def convert_to_tuple(key):
+    resulting_tuple = ast.literal_eval(key)       #returns a list from the string
+    Key_tuple=tuple(resulting_tuple)
+    return Key_tuple
 
 def RSAencryptI(plaintext, public_key):
     e, n = public_key
@@ -114,20 +134,3 @@ def RSAdecryptI(ciphertext, private_key):
         raise ValueError("Ciphertext must be less than n for decryption.")
     plaintext = pow(ciphertext, d, n)
     return plaintext
-
-def create_sig(message, private_key):
-    signature = RSAencryptCH(message, private_key)
-    return signature
-
-
-def verify_sig(message, signature, public_key):
-    decrypted_message_digest = RSAdecryptCH(signature, public_key)
-    if decrypted_message_digest == message:
-        return True  # Signature is valid
-    else:
-        return False  # Signature is invalid
-    
-def convert_to_tuple(key):
-    resulting_tuple = ast.literal_eval(key)       #returns a list from the string
-    Key_tuple=tuple(resulting_tuple)
-    return Key_tuple
